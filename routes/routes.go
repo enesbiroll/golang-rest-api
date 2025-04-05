@@ -1,8 +1,8 @@
 package routes
 
 import (
-	middleware "rest-api/Middlewares"
 	"rest-api/controllers"
+	middleware "rest-api/middlewares"
 	"time"
 
 	"github.com/gofiber/fiber/v2"

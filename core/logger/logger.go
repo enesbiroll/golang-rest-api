@@ -4,8 +4,8 @@ import (
 	"io"
 	"os"
 
-	"rest-api/Config"
-	"rest-api/Models"
+	Config "rest-api/config"
+	Models "rest-api/models"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"

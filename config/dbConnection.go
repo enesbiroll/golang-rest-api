@@ -3,7 +3,7 @@ package Config
 import (
 	"fmt"
 	"os"
-	"rest-api/Models"
+	Models "rest-api/models"
 
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"

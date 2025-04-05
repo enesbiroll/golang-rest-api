@@ -1,8 +1,8 @@
 package services
 
 import (
-	"rest-api/Config"
-	"rest-api/Models"
+	Config "rest-api/config"
+	Models "rest-api/models"
 	"time"
 )
 

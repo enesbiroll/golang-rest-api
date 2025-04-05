@@ -1,9 +1,9 @@
 package main
 
 import (
-	"rest-api/Config"
-	routes "rest-api/Routes"
+	Config "rest-api/config"
 	"rest-api/core/logger"
+	routes "rest-api/routes"
 
 	"github.com/gofiber/fiber/v2"
 )

@@ -1,8 +1,8 @@
 package controllers
 
 import (
-	"rest-api/Models"
 	"rest-api/core/logger"
+	Models "rest-api/models"
 	"rest-api/services"
 	"rest-api/utils"
 
