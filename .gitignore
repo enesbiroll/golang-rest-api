@@ -1,0 +1,39 @@
+# Go Binary
+/bin
+/*.exe
+/*.exe~
+/*.out
+/*.test
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories
+/vendor/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+
+# macOS specific
+.DS_Store
+
+# Linux specific
+*~
+
+# Windows specific
+Thumbs.db
+
+# Log files
+*.log
+
+# Environment variables file
+.env
+
+# Build artifacts
+*.a
+*.so
+*.tar.gz
+postman.tar.gz
