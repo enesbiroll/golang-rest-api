@@ -1,11 +1,9 @@
-package Config
+package config
 
 import (
 	"fmt"
-	"os"
-	Models "rest-api/models"
+	"rest-api/models"
 
-	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -13,28 +11,31 @@ import (
 var DB *gorm.DB
 
 func Connect() {
-	// Load environment variables
-	godotenv.Load()
-	dbhost := os.Getenv("MYSQL_HOST")
-	dbuser := os.Getenv("MYSQL_USER")
-	dbpass := os.Getenv("MYSQL_PASS")
-	dbname := os.Getenv("MYSQL_DB_NAME")
+	// Manuel olarak veritabanı bağlantı bilgilerini giriyoruz
+	dbhost := "localhost"
+	dbuser := "root"
+	dbpass := ""
+	dbname := "golangtest"
 
-	// Connection string
+	// Bağlantı dizesini oluştur
 	connection := fmt.Sprintf("%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbuser, dbpass, dbhost, dbname)
+
+	// Veritabanı bağlantısını aç
 	dbConnection, err := gorm.Open(mysql.Open(connection), &gorm.Config{})
 	if err != nil {
-		panic("connection failed to the database ")
+		panic("Connection failed to the database") // Hata alırsanız, panik yapın
 	}
-	DB = dbConnection
-	fmt.Println("db connected successfully")
 
-	// Auto migrate the models
+	// DB nesnesine atayın
+	DB = dbConnection
+	fmt.Println("DB connected successfully")
+
+	// Veritabanı model göçü işlemi
 	AutoMigrate(dbConnection)
 }
 
 func AutoMigrate(connection *gorm.DB) {
-	// Migrate models, including the Log model
-	connection.Debug().AutoMigrate(&Models.Student{}, &Models.Log{})
+	// Veritabanı modellerini otomatik olarak göç ettir
+	connection.Debug().AutoMigrate(&models.Student{}, &models.Log{}, &models.User{})
 	fmt.Println("Database Migrated Successfully")
 }

@@ -1,24 +1,24 @@
 package logger
 
 import (
+	"fmt"
 	"io"
 	"os"
-
-	Config "rest-api/config"
-	Models "rest-api/models"
+	"rest-api/config"
 
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
 )
 
-// Initialize the logger
+// Global logger
 var Log *logrus.Logger
 
-// LogHook for logging into the database for specific levels
+// LogHook for logging to the database
 type LogHook struct {
 	DB *gorm.DB
 }
 
+// LogHook levels for warning and fatal only
 func (hook *LogHook) Levels() []logrus.Level {
 	return []logrus.Level{
 		logrus.WarnLevel,
@@ -26,40 +26,53 @@ func (hook *LogHook) Levels() []logrus.Level {
 	}
 }
 
+// Log writes to the database
 func (hook *LogHook) Fire(entry *logrus.Entry) error {
-	// Only log warning or fatal messages to the database
+	// Only log 'warn' and 'fatal' levels
 	if entry.Level == logrus.WarnLevel || entry.Level == logrus.FatalLevel {
-		logRecord := Models.Log{
+		logRecord := struct {
+			Level   string `json:"level"`
+			Message string `json:"message"`
+		}{
 			Level:   entry.Level.String(),
 			Message: entry.Message,
 		}
-		return hook.DB.Create(&logRecord).Error
+
+		// Insert into DB
+		if err := hook.DB.Create(&logRecord).Error; err != nil {
+			return fmt.Errorf("failed to insert log into database: %v", err)
+		}
 	}
+
 	return nil
 }
 
 // Initialize the logger
 func Init() {
-	// Create a new logger instance
+	// Check if Log is already initialized
+	if Log != nil {
+		return
+	}
+
+	// Initialize a new logrus instance
 	Log = logrus.New()
 
-	// Set log level (you can change it to Debug, Info, Warn, etc.)
+	// Set log level to info
 	Log.SetLevel(logrus.InfoLevel)
 
-	// Create or open the log file
+	// Open log file
 	file, err := os.OpenFile("app.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		Log.Error("Could not open log file, using console logging instead")
 	} else {
-		// Log to both console and file using MultiWriter
-		Log.SetOutput(io.MultiWriter(os.Stdout, file))
+		Log.SetOutput(io.MultiWriter(os.Stdout, file)) // Write to both stdout and file
 	}
 
-	// Set log format (you can use JSON or Text format)
+	// Set log format
 	Log.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp: true,
 	})
 
-	// Add the database logging hook for specific log levels (warn and fatal)
-	Log.AddHook(&LogHook{DB: Config.DB})
+	// Add DB hook for warning and fatal logs
+	Log.AddHook(&LogHook{DB: config.DB})
 }

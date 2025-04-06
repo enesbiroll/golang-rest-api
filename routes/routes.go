@@ -36,3 +36,12 @@ func StudentRoute(app *fiber.App) {
 	// Route: Öğrenci silme
 	app.Delete("/students/:id", controllers.DeleteStudent)
 }
+
+func StudentTestRoute(app *fiber.App) {
+	api := app.Group("/students")
+	api.Post("/", controllers.CreateStudent)
+	api.Get("/", controllers.GetStudents)
+	api.Get("/:id", controllers.GetStudentByID)
+	api.Put("/:id", controllers.UpdateStudent)
+	api.Delete("/:id", controllers.DeleteStudent)
+}

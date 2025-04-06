@@ -1,32 +1,34 @@
 package main
 
 import (
-	Config "rest-api/config"
+	"rest-api/config"
 	"rest-api/core/logger"
-	routes "rest-api/routes"
+	_ "rest-api/docs" // Import the docs package for Swagger
+	"rest-api/routes"
 
 	"github.com/gofiber/fiber/v2"
+	fiberSwagger "github.com/swaggo/fiber-swagger" // Import Swagger middleware
 )
 
 func main() {
-	// Initialize the logger
+	// Initialize logger
 	logger.Init()
 
-	// Initialize the database connection
-	Config.Connect()
+	// Connect to database
+	config.Connect()
 
-	// Create a new Fiber app instance
+	// Create a new Fiber app
 	app := fiber.New()
 
-	// Set up the routes for the app
+	// Set up routes
 	routes.StudentRoute(app)
+	routes.AuthRoute(app)
 
-	// Start the application on port 3000
+	// Serve Swagger UI
+	app.Get("/swagger/*", fiberSwagger.WrapHandler) // Serve Swagger UI at /swagger/*
+
+	// Start the server
 	if err := app.Listen(":3000"); err != nil {
 		logger.Log.Fatalf("Error starting server: %v", err)
 	}
-	// Log to console and file
-	logger.Log.Info("This is an info message")
-	logger.Log.Warn("This is a warning message")
-	logger.Log.Fatal("This is a fatal error message")
 }

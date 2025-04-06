@@ -18,7 +18,7 @@ var (
 	mutex       sync.Mutex
 )
 
-// Geliştirilmiş: limitCount, limitDuration, banDuration, customMessage
+// Rate limit middleware
 func RateLimitMiddleware(limitCount int, limitDuration time.Duration, banDuration time.Duration, customMessage string) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		ip := c.IP()
@@ -40,11 +40,14 @@ func RateLimitMiddleware(limitCount int, limitDuration time.Duration, banDuratio
 
 		client, exists := requestsMap[ip]
 
+		// Eğer IP'nin verisi yoksa, yeni bir veri oluştur
 		if !exists || now.Sub(client.FirstSeen) > limitDuration {
+			// Yeni veriyi başlat
 			requestsMap[ip] = &clientData{Count: 1, FirstSeen: now}
 		} else {
 			client.Count++
 			if client.Count > limitCount {
+				// Oran sınırlama tetiklendi, IP'yi yasakla
 				bannedIPs[ip] = now
 				delete(requestsMap, ip)
 				return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
